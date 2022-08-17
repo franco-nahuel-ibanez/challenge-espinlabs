@@ -13,6 +13,7 @@ import {
 
 const App = () => {
 
+
   const [data, setData] = useState([
     {id: 1, nombre: "Lionel", apellido: "Messi"},
     {id: 2, nombre: "Diego", apellido: "Maradona"},
@@ -28,11 +29,64 @@ const App = () => {
 
   const {id, nombre, apellido} = form
 
+  const mostrarModalEditar = (dato) => {
+    setForm(dato)
+    setModalEditar(true)
+  }
+
+  const cerrarModalEditar = () => {
+    setModalEditar(false)
+  }
+
+  const mostrarModalInsertar = () => {
+    setModalInsertar(true)
+  }
+
+  const cerrarModalInsertar = () => {
+    setModalInsertar(false)
+  }
+
+  const editar = (dato) => {
+    const nuevo = data.map( registro => registro.id === dato.id ? registro = dato : registro )
+    setData(nuevo)
+    setModalEditar(false)
+  }
+
+  const eliminar = (id) => {
+    let confirm = window.confirm(`Estas seguro de eliminar el registro con ${id}`)
+    if(confirm){
+      const nuevo = data.filter( registro => registro.id !== id ) 
+      setData( nuevo )
+    }
+  }
+
+  const insertar = () => {
+    if(nombre.trim() !== '' && apellido.trim() !== ''){
+      const nuevo = {
+        id: data.length + 1,
+        nombre,
+        apellido
+      }
+      setData([...data, nuevo])
+      setModalInsertar(false)
+    }
+  }
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    })
+  }
+
   return (
     <>
       <Container>
         <br />
-        <Button color="success">Crear</Button>
+        <Button 
+          color="success" 
+          onClick={ mostrarModalInsertar } 
+        >Crear</Button>
         <br />
         <br />
 
@@ -48,15 +102,16 @@ const App = () => {
 
           <tbody>
             {
-              data.map( ({id, nombre, apellido}) => (
-                <tr key={id}>
-                  <td>{id}</td>
-                  <td>{nombre}</td>
-                  <td>{apellido}</td>
+              data.map( (dato) => (
+                <tr key={dato.id}>
+                  <td>{dato.id}</td>
+                  <td>{dato.nombre}</td>
+                  <td>{dato.apellido}</td>
                   <td>
                     <Button
                       color="primary"
                       className="mx-1"
+                      onClick={() => mostrarModalEditar(dato)}
                     >
                       Editar
                     </Button>
@@ -64,6 +119,7 @@ const App = () => {
                     <Button
                       color="danger"
                       className="mx-1"
+                      onClick={() => eliminar(dato.id)}
                     >
                       Eliminar
                     </Button>
@@ -99,6 +155,7 @@ const App = () => {
               className="form-control"
               name="nombre"
               type="text"
+              onChange={handleChange}
               value={nombre}
             />
           </FormGroup>
@@ -109,6 +166,7 @@ const App = () => {
               className="form-control"
               name="apellido"
               type="text"
+              onChange={handleChange}
               value={apellido}
             />
           </FormGroup>
@@ -117,12 +175,14 @@ const App = () => {
         <ModalFooter>
           <Button
             color="primary"
+            onClick={() => editar(form)}
           >
             Editar
           </Button>
 
           <Button
             color="danger"
+            onClick={cerrarModalEditar}
           >
             Cancelar
           </Button>
@@ -153,6 +213,7 @@ const App = () => {
               className="form-control"
               name="nombre"
               type="text"
+              onChange={handleChange}
             />
           </FormGroup>
 
@@ -162,6 +223,7 @@ const App = () => {
               className="form-control"
               name="apellido"
               type="text"
+              onChange={handleChange}
             />
           </FormGroup>
         </ModalBody>
@@ -169,12 +231,14 @@ const App = () => {
         <ModalFooter>
           <Button
             color="primary"
+            onClick={insertar}
           >
             Insertar
           </Button>
 
           <Button
             color="danger"
+            onClick={cerrarModalInsertar}
           >
             Cancelar
           </Button>
